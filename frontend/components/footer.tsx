@@ -1,6 +1,8 @@
+import { containerStyles } from "@/styles/style";
+
 export default function Footer() {
     return (
-        <footer style={{ textAlign: 'center', padding: '1rem', backgroundColor: '#f5f5f5', marginTop: '2rem' }}>
+        <footer style={containerStyles.footerContainer}>
             <p>&copy; {new Date().getFullYear()} MonSite. Tous droits réservés.</p>
         </footer>
     );

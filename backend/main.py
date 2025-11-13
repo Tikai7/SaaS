@@ -30,30 +30,36 @@ def root():
 def get_available_models():
     return Config.AVAILABLE_MODELS
 
-from groq import GroqError
-
 @app.post("/groq")
 def get_cover_letter(user_prompt: dict):
+    print(f"[INFO] Retriving data from user prompt...")
+
     job_description = user_prompt.get("job_description", "")
     resume = user_prompt.get("resume", "")
     cover_letter_example = user_prompt.get("cover_letter_example", "")
 
+    print(f"[INFO] Normalizing content...")
+
     content = Functions.get_normalized_content(job_description, resume, cover_letter_example)
 
     try:
+        print(f"[INFO] Groq API Call using {Config.AVAILABLE_MODELS[Config.CURRENT_MODEL_INDEX]}...")
         response = groq_client.chat.completions.create(
             messages=[{"role": "user", "content": content}],
             model=Config.AVAILABLE_MODELS[Config.CURRENT_MODEL_INDEX],
         )
+        print(f"[INFO] Done.")
     except GroqError as e:
-        if "rate limit" in str(e).lower():
-            Config.CURRENT_MODEL_INDEX += 1
-            if Config.CURRENT_MODEL_INDEX >= len(Config.AVAILABLE_MODELS):
-                Config.CURRENT_MODEL_INDEX = 0
-                return {"error": "All models have been rate limited. Please try again in 1 minute."}
-            return get_cover_letter(user_prompt)
-        return {"error": str(e)}
-
+        print(f"[ERROR] {e}")
+        Config.CURRENT_MODEL_INDEX += 1
+        if Config.CURRENT_MODEL_INDEX >= len(Config.AVAILABLE_MODELS):
+            Config.CURRENT_MODEL_INDEX = 0
+            return {
+                "content": "[ERROR] Sorry, all models have been rate limited. Please try again in 1 minute.",
+                "used_model" : "None"
+            }
+        return get_cover_letter(user_prompt)
+        
     return {
         "content": response.choices[0].message.content,
         "used_model": Config.AVAILABLE_MODELS[Config.CURRENT_MODEL_INDEX]

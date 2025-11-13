@@ -1,3 +1,6 @@
+export const MAX_JOB = 10
+export const TOAST_TIME = 2000
+
 export const PALETTE = {
     primary: '#019875',
     secondary: '#B8293D',
@@ -9,18 +12,23 @@ export const PALETTE = {
     border: '#EAEAEA'
 };
 
+export const transitionStyle = {
+    transition: 'opacity 0.3s ease-in-out, transform 0.3s ease-in-out',
+};
+
 export const linkStyles = {
     navLink: {
         textDecoration: 'none',
         color: PALETTE.black,
         fontSize: '16px',
-        fontWeight: '500',
+        fontWeight: 'bold',
     },
     navConnexionLink: {
         textDecoration: 'none',
         color: PALETTE.primary,
         fontSize: '16px',
-        fontWeight: '600',
+        fontWeight: 'bold',
+        lineHeight: '1.5',
     },
 };
 
@@ -34,11 +42,28 @@ export const textStyles = {
         color : PALETTE.black,
         lineHeight: 1.1,
     },
+    h2: {
+        fontSize: '28px',
+        fontWeight: 'bold' as const,
+        color : PALETTE.primary,
+        marginBottom: '20px',
+    },
+    h3: {
+        fontSize: '20px',
+        fontWeight: 'bold' as const,
+        color : PALETTE.primary,
+        marginLeft: '10px',
+    },
     p: {
         fontSize: '18px',
         textAlign: 'center' as const,
         marginTop: '1%',
         color : PALETTE.black
+    },
+    span: {
+        fontSize: '16px',
+        fontStyle: 'italic' as const,
+        color : PALETTE.gray
     },
 };
 
@@ -86,8 +111,43 @@ export const buttonStyles = {
         cursor: 'pointer',
         width: '15%',
         marginTop: '3%',
+        border : "2px solid " + PALETTE.black,
     },
 
+};
+
+
+export const modalStyles = {
+    overlay: {
+        display: 'flex',
+        position: 'fixed' as const,
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        justifyContent: 'center',
+        alignItems: 'center',
+        zIndex: 1000,
+    },
+    content: {
+        backgroundColor: 'white',
+        padding: '30px',
+        borderRadius: '10px',
+        width: '90%',
+        maxWidth: '600px',
+        boxShadow: '0 5px 15px rgba(0, 0, 0, 0.5)',
+    },
+    textArea: {
+        width: '100%',
+        minHeight: '200px',
+        padding: '10px',
+        marginTop: '15px',
+        marginBottom: '15px',
+        border: `1px solid ${PALETTE.gray}`, 
+        borderRadius: '5px',
+        resize: 'none' as const,
+    },
 };
 
 export const containerStyles = {
@@ -139,5 +199,52 @@ export const containerStyles = {
         boxSizing: 'border-box' as const,
         resize: 'none' as const,
         maxHeight: '60px',
+    },
+    testimonialsSection: {
+        backgroundColor: PALETTE.lightGray,
+        padding: '40px 20px',
+        textAlign: 'center' as const,
+    },
+    footerContainer : {
+        backgroundColor: PALETTE.black,
+        color: PALETTE.white,
+        textAlign: 'center' as const,   
+        padding: "5%",
+    },
+    testimonialsContainer: {
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '20px',
+        marginTop: '30px',
+        flexWrap: 'wrap' as const,
+    },
+    testimonialCard: {
+        backgroundColor: PALETTE.white,
+        padding: '20px',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        maxWidth: '300px',
+    },
+    generatedLetterContainer: {
+        marginTop: '1%',
+        padding: '20px',
+        border: `2px solid ${PALETTE.black}`,
+        borderRadius: '8px',
+        backgroundColor: PALETTE.white,
+        maxWidth: '800px',
+        width: '100%',
+    },
+    generatedLetterTextarea: {
+        width: '100%',
+        padding: '1.5%',
+        border: '1px solid #E5E7EB',
+        borderRadius: '8px',
+        fontSize: '1rem',
+        lineHeight: '1.6',
+        whiteSpace: 'pre-wrap', // Important pour gérer les sauts de ligne
+        resize: 'none' as const, // Important pour verrouiller la taille
+        fontFamily: 'Inter, sans-serif', // Utilisez la même police que le reste de votre design
+        backgroundColor: PALETTE.white,
+        color: PALETTE.text,
     },
 };
