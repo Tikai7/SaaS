@@ -1,10 +1,18 @@
+import requests
+from urllib.parse import urlparse
+from typing import Tuple
+from bs4 import BeautifulSoup 
+import re 
+
 class Config:
     CURRENT_MODEL_INDEX = 0
     TOO_MANY_REQUESTS = 429
     AVAILABLE_MODELS = [
         "llama-3.1-8b-instant",                       
         "meta-llama/llama-4-scout-17b-16e-instruct",  
-        "llama-3.3-70b-versatile"                
+        "llama-3.3-70b-versatile",
+        "openai/gpt-oss-20b",
+        "openai/gpt-oss-120b"         
     ]
     PRE_PROMPT = """
         Tu es un assistant IA spécialisé dans la rédaction de lettres de motivation ultra-personnalisées et convaincantes, avec un style humain et direct.
@@ -65,3 +73,82 @@ class Functions:
             {cover_letter_example}
             """
         return content
+    
+    @staticmethod
+    def scrap_if_needed(job_description : str):
+        if Functions.is_url(job_description):
+            print("[INFO] The job description is a URL, scrapping it...")
+            return Functions.scrape_job_description(job_description)
+        print("[INFO] The job description is already provided.")
+        return job_description
+
+    @staticmethod
+    def is_url(url_string: str) -> bool:
+        try:
+            result = urlparse(url_string)
+            return result.scheme in ['http', 'https'] and bool(result.netloc)
+        except ValueError:
+            return False
+        
+    @staticmethod
+    def scrape_job_description(url: str) -> Tuple[str, bool]:
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                          "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
+        }
+
+        try:
+            response = requests.get(url, headers=headers, timeout=10)
+            response.raise_for_status()
+            soup = BeautifulSoup(response.text, "html.parser")
+            domain = urlparse(url).netloc.lower()
+            text_content = ""
+
+            if "welcometothejungle" in domain:
+                title = soup.find("h1")
+                company = soup.find("a", {"data-testid": "company-link"})
+                desc = soup.find("div", {"data-testid": "job-description"})
+                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
+                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
+                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
+
+            elif "linkedin" in domain:
+                title = soup.find("h1")
+                company = soup.find("a", class_="topcard__org-name-link")
+                desc = soup.find("div", class_="show-more-less-html__markup")
+                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
+                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
+                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
+
+            elif "hellowork" in domain or "regionsjob" in domain:
+                title = soup.find("h1")
+                company = soup.find("div", class_="companyName")
+                desc = soup.find("div", class_="description")
+                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
+                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
+                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
+
+            elif "indeed" in domain:
+                title = soup.find("h1")
+                company = soup.find("div", {"data-company-name": True})
+                desc = soup.find("div", {"id": "jobDescriptionText"})
+                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
+                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
+                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
+
+            else:
+                title = soup.find("h1")
+                paragraphs = soup.find_all(["p", "li"])
+                joined = "\n".join(p.get_text(strip=True) for p in paragraphs)
+                text_content = f"{title.get_text(strip=True) if title else ''}\n\n{joined}"
+
+            # Nettoyage de texte
+            text_content = "\n".join(line.strip() for line in text_content.splitlines() if line.strip())
+            if len(text_content) < 200:
+                print("[WARN] Description semble incomplète ou courte.")
+            
+            print(f"[INFO] Description :\n {text_content}")
+            return text_content, True
+
+        except requests.exceptions.RequestException as e:
+            return f"[ERROR] Couldn't scrape {url}: {e}", False

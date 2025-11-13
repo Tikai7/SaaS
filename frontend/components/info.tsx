@@ -13,10 +13,12 @@ export default function UserContext(
     }
 ) {
     const [isVisible, setIsVisible] = useState(false);
+    const [tempText, setTempText] = useState(completeText)
 
     useEffect(() => {
         const timer = setTimeout(() => {
             setIsVisible(true);
+            setTempText(completeText)
         }, 50); 
 
         return () => clearTimeout(timer); 
@@ -33,7 +35,11 @@ export default function UserContext(
         ...transitionStyle,
     };
 
-
+    function handleCancel() {
+        setCompleteText(tempText)
+        handleComplete()
+    }
+    
     return (
         <div style={{ ...modalStyles.overlay, ...overlayAnimation }}>
             <div style={{ ...modalStyles.content, ...contentAnimation }}>
@@ -67,7 +73,7 @@ export default function UserContext(
                         Sauvegarder
                     </button>
                     <button 
-                        onClick={handleComplete} 
+                        onClick={handleCancel} 
                         style={{...buttonStyles.secondary, color: PALETTE.secondary, borderColor: PALETTE.secondary, marginLeft: '10px'}} 
                     >
                         Annuler

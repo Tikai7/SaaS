@@ -40,8 +40,15 @@ def get_cover_letter(user_prompt: dict):
 
     print(f"[INFO] Normalizing content...")
 
+
+    job_description, state = Functions.scrap_if_needed(job_description)
     content = Functions.get_normalized_content(job_description, resume, cover_letter_example)
 
+    if not state:
+        return {
+            "content" : job_description,
+            "used_model" : "None"
+        }
     try:
         print(f"[INFO] Groq API Call using {Config.AVAILABLE_MODELS[Config.CURRENT_MODEL_INDEX]}...")
         response = groq_client.chat.completions.create(
