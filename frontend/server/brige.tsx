@@ -14,7 +14,7 @@ export async function GenerateCoverLetter(
     data: { 
         job_description: string; 
         resume: string; 
-        cover_letter_example?: string
+        guidelines?: string
     }
 ){
     try {

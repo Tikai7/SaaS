@@ -3,7 +3,7 @@ from groq import Groq, GroqError
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from utils import Config, Functions
+from utils import Config, Functions, Scrapper
 
 # Load environment variables from .env file
 load_dotenv()
@@ -36,13 +36,13 @@ def get_cover_letter(user_prompt: dict):
 
     job_description = user_prompt.get("job_description", "")
     resume = user_prompt.get("resume", "")
-    cover_letter_example = user_prompt.get("cover_letter_example", "")
+    guidelines = user_prompt.get("guidelines", "")
 
     print(f"[INFO] Normalizing content...")
 
 
-    job_description, state = Functions.scrap_if_needed(job_description)
-    content = Functions.get_normalized_content(job_description, resume, cover_letter_example)
+    job_description, state = Scrapper.scrap_if_needed(job_description)
+    content = Functions.get_normalized_content(job_description, resume, guidelines)
 
     if not state:
         return {

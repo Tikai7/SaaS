@@ -50,18 +50,18 @@ export default function UserContext(
                     </h2>          
                     :
                     <h2 style={textStyles.h2}>
-                        Saisie d'un exemple de lettre
+                        Saisie d'instructions
                     </h2>          
                 }
                 {
                     isExperiences ? 
                     <p>Veuillez entrer ici le texte complet de toutes vos expériences professionnelles (format CV, ou juste une liste détaillée).</p>
                     :
-                    <p>Veuillez entrer ici un exemple de lettre de motivation que vous avez rédigée auparavant.</p>
+                    <p>Veuillez entrer ici des instructions pour l'IA.</p>
                 }
                 <textarea
                     style={modalStyles.textArea}
-                    placeholder={isExperiences ? "Saisissez ici toutes vos expériences..." : "Saisissez ici un exemple de lettre de motivation..."}
+                    placeholder={isExperiences ? "Saisissez ici toutes vos expériences..." : "Saisissez ici de gentils instructions pour l'IA... :)"}
                     value={completeText}
                     onChange={(e) => setCompleteText(e.target.value)}
                 />

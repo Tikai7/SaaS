@@ -10,12 +10,12 @@ export default function Letter() {
     // CORRECTION 1: Initialisation de jobDescription avec au moins un élément
     const [jobDescription, setJobDescription] = useState<string[]>(['']);
     const [resume, setResume] = useState('');
-    const [coverLetterExample, setCoverLetterExample] = useState('');
+    const [guidelines, setGuidelines] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
     // CORRECTION 2: numberOfJobs synchronisé avec la longueur de jobDescription
     const [numberOfJobs, setNumberOfJobs] = useState(1);
     const [isModalXPOpen, setIsModalXPOpen] = useState(false);
-    const [isModalLetterOpen, setIsModalLetterOpen] = useState(false);
+    const [isModalGuidelinesOpen, setIsModalGuidelinesOpen] = useState(false);
     const [openLetters, setOpenLetters] = useState([] as boolean[])
     const [isToastVisible, setIsToastVisible] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
@@ -31,7 +31,7 @@ export default function Letter() {
                     {
                         job_description: description,
                         resume: resume,
-                        cover_letter_example: coverLetterExample
+                        guidelines: guidelines
                     }
                 );
             });
@@ -79,7 +79,7 @@ export default function Letter() {
     }
 
     function handleCompleteLetter() {
-        setIsModalLetterOpen(old => !old);
+        setIsModalGuidelinesOpen(old => !old);
     }
 
     function handleXPSave() {
@@ -116,69 +116,37 @@ export default function Letter() {
         });
     }
 
-    function formatGeneratedText(generatedTextJson : string) : string {
-        const jsonMatch = generatedTextJson.match(/\[JSON_START\]\s*(\{[\s\S]*?\})\s*\[JSON_END\]/);
+    function formatGeneratedText(generatedText: string) {
+        let formattedLetter = generatedText;
+        const match = generatedText.match(/\[DEBUT\]([\s\S]*?)\[FIN\]/);
+        const match2 = generatedText.match(/\[START\]([\s\S]*?)\[END\]/);
+        const match3 = generatedText.match(/\[DEBUT\]([\s\S]*?)\[END\]/);
+        const match4 = generatedText.match(/\[START\]([\s\S]*?)\[FIN\]/);
 
-        if (jsonMatch && jsonMatch[1]) { 
-            try {
-                const jsonString = jsonMatch[1];
-                const parsedJson = JSON.parse(jsonString);
-                let formattedLetter = '';
-                
-                // Ajouter la salutation au début, avant le sujet et les coordonnées pour un format plus "lettre"
-                if (parsedJson.salutation) {
-                    formattedLetter += `${parsedJson.salutation}\n\n`;
-                }
-                if (parsedJson.subject) {
-                    formattedLetter += `Objet : ${parsedJson.subject}\n\n`;
-                }
-                if (parsedJson.header) {
-                    formattedLetter += `${parsedJson.header.user_contact}\n\n${parsedJson.header.company_contact}\n\n`;
-                }
-                if (parsedJson.introduction) {
-                    formattedLetter += `${parsedJson.introduction}\n\n`;
-                }
-                if (parsedJson.body) {
-                    formattedLetter += `${parsedJson.body}\n\n`;
-                }
-
-                // Gestion des sections "bodyN" si elles existent (logique originale conservée)
-                for (const key in parsedJson) {
-                    if (key.startsWith('body') && key !== 'body' && parsedJson[key]) {
-                        formattedLetter += `${parsedJson[key]}\n\n`;
-                    }
-                }
-
-                if (parsedJson.conclusion) {
-                    formattedLetter += `${parsedJson.conclusion}\n\n`;
-                }
-                if (parsedJson.closing_formula) {
-                    formattedLetter += `${parsedJson.closing_formula}\n`;
-                }
-                if (parsedJson.signature) {
-                    formattedLetter += `${parsedJson.signature}\n`;
-                }
-                // Nettoyage : remplacer les [object Object] et les espaces superflus
-                formattedLetter = formattedLetter.replace(/\[object Object\]/g, '').trim();
-
-                return formattedLetter.trim();
-                
-            } catch (e) {
-                console.error('Erreur lors du parsing du JSON:', e);
-                return generatedTextJson;
-            }
+        if (match && match[1]) {
+            formattedLetter = match[1].trim();
         }
-        return generatedTextJson;
+        else if (match2 && match2[1]) {
+            formattedLetter = match2[1].trim();
+        }
+        else if (match3 && match3[1]) {
+            formattedLetter = match3[1].trim();
+        }
+        else if (match4 && match4[1]) {
+            formattedLetter = match4[1].trim();
+        }
+
+        return formattedLetter;
     }
 
-    
+
     return (
         <section style={containerStyles.letterSectionContainer}>
             <h1 style={textStyles.h1}>
                 Générez en
                 <span style={{...textStyles.h1, color : PALETTE.white}}> un clic</span><br/> vos lettres de motivation !
             </h1>
-            <p style={textStyles.p}>Completez vos expériences, et ajoutez un exemple de lettre pour avoir <br/> la meilleure génération possible :)</p>
+            <p style={textStyles.p}>Completez vos expériences, et ajoutez des instructions pour avoir <br/> la meilleure génération possible :)</p>
 
             <div style={containerStyles.buttonContainer}>
                 <button onClick={handleCompleteXP} style={buttonStyles.secondary}>
@@ -187,7 +155,7 @@ export default function Letter() {
                 </button>
                 <button onClick={handleCompleteLetter} style={buttonStyles.secondary}>
                     <MdDescription size={20} style={{ marginRight: 8 }} />
-                    Ajouter un exemple de lettre
+                    Ajouter des instructions
                 </button>
             </div>
 
@@ -201,13 +169,13 @@ export default function Letter() {
                 />
             }
             {
-                isModalLetterOpen && 
+                isModalGuidelinesOpen && 
                 <UserContext  
                     handleComplete={handleCompleteLetter} 
                     handleSave={handleLetterSave} 
                     isExperiences={false} 
-                    completeText={coverLetterExample} 
-                    setCompleteText={setCoverLetterExample} 
+                    completeText={guidelines} 
+                    setCompleteText={setGuidelines} 
                 />
             }
 
@@ -322,6 +290,7 @@ export default function Letter() {
                         opacity: isToastVisible ? 1 : 0,
                         transition: 'opacity 0.3s ease-in-out',
                         boxShadow: '0 4px 12px rgba(0, 0, 0, 0.2)',
+                        border : "2px solid",
                         margin: 0
                     }}
                 >

@@ -2,7 +2,6 @@ import requests
 from urllib.parse import urlparse
 from typing import Tuple
 from bs4 import BeautifulSoup 
-import re 
 
 class Config:
     CURRENT_MODEL_INDEX = 0
@@ -15,81 +14,98 @@ class Config:
         "openai/gpt-oss-120b"         
     ]
     PRE_PROMPT = """
-        Tu es un assistant IA spécialisé dans la rédaction de lettres de motivation ultra-personnalisées et convaincantes, avec un style humain et direct.
-        L'utilisateur te fournira : 
-        - son CV complet 
-        - toutes ses expériences professionnelles et projets 
-        - un exemple de lettre de motivation s'il en a une 
-        - l'offre d'emploi ou le poste visé.
+        Tu es un assistant IA expert en rédaction de lettres de motivation hautement personnalisées, professionnelles et orientées résultats.
 
-        Ta tâche est de créer une lettre de motivation qui : 
-        1. Met en valeur uniquement les expériences et compétences pertinentes pour le poste (tu peux te concentrer sur une ou deux si c'est ce qui rend la lettre la plus forte).
-        2. S'appuie sur le style de l'exemple fourni si disponible, mais garde un ton naturel et humain.
-        3. Évite les mots creux, formules pompeuses ou clichés du type "salutations distinguées", "motivation sans faille", etc.
-        4. Est structurée de manière claire et professionnelle.
-        5. Vérifie l'orthographe et la grammaire.
-        6. Langue : si l'offre d'emploi est en anglais, rédige la lettre en anglais ; sinon, en français.
+        L'utilisateur te fournira :
+        - Son CV complet (texte brut ou structuré)
+        - Ses expériences professionnelles, projets et compétences
+        - Ses propres instructions ou consignes spécifiques (optionnel)
+        - L'offre d'emploi ou le poste ciblé
 
-        Lorsque tu rédiges la lettre, sélectionne **intelligemment** les expériences à mettre en avant pour qu'elles correspondent parfaitement à l'offre, même si cela signifie ignorer certaines expériences moins pertinentes.
-        Ne mentionne jamais que tu es une IA dans la lettre.
-        Le résultat doit paraître écrit par un humain, crédible et engageant.
+        TA MISSION :
+        Rédiger une lettre de motivation parfaitement adaptée au poste, en respectant les exigences suivantes :
 
-        **INSTRUCTION CRUCIALE DE FORMATAGE :**
-        **1. Le seul résultat que tu dois fournir est le JSON strict.**
-        **2. N'ajoute aucun commentaire, explication, ou texte avant ou après le JSON.**
-        **3. Encadre le JSON final avec les balises [JSON_START] et [JSON_END] pour en faciliter l'isolation programmatique.**
+        1. Pertinence maximale :
+        - Sélectionner uniquement les expériences, compétences et réalisations réellement utiles pour le poste.
+        - Ignorer les éléments non pertinents, même s'ils sont dans le CV.
 
-        Le format final **DOIT** être un JSON strict décomposé par sections :
+        2. Style :
+        - Ton humain, naturel, direct, fluide.
+        - S'inspirer du style de l'exemple fourni si disponible, sans copier.
+        - Bannir les clichés (“motivation sans faille”, “véritable passion”, etc.).
+        - Ne jamais dire que le texte est généré par une IA.
 
-        [JSON_START]
-        {
-            "subject": "<Objet de la lettre de motivation, clair et concis>",
-            "header": {
-                "user_contact": "<Coordonnées de l'utilisateur : Nom, Adresse, Téléphone, Email>",
-                "company_contact": "<Coordonnées de l'entreprise : Nom de l'entreprise, Adresse>"
-            },
-            "salutation": "<Formule d'appel personnalisée, adressée à la personne responsable si connue>",
-            "introduction": "<Présentation brève de l'utilisateur, du poste visé et comment il a découvert l'offre>",
-            "body": "<Détail des compétences, expériences, réalisations pertinentes, et explication de la motivation réelle à rejoindre l'entreprise>",
-            "conclusion": "<Résumé des points clés, réitération de l'intérêt et proposition d'un échange ou entretien>",
-            "closing_formula": "<Formule de politesse simple, claire, naturelle (ex. : 'Cordialement,')>",
-            "signature": "<Nom et Prénom de l'utilisateur>"
-        }
-        [JSON_END]
+        3. Structure :
+        - Lettre claire, professionnelle, aérée, avec une logique narrative cohérente.
+        - Paragraphes construits autour d'idées fortes.
+
+        4. Correction :
+        - Orthographe, grammaire, formulation impeccables.
+
+        5. Langue :
+        - Si l'offre est en anglais → lettre en anglais.
+        - Sinon → lettre en français.
+
+        6. Ultra-adaptation :
+        - Comprendre le contexte du poste et les besoins de l'entreprise.
+        - Montrer précisément ce que l'utilisateur apporte.
+
+        FORMATTAGE OBLIGATOIRE :
+        Le résultat final doit apparaître EXCLUSIVEMENT entre les balises suivantes :
+
+        [DEBUT]
+        (UNIQUEMENT la lettre complète ici)
+        [FIN]
+
+        Règles :
+        - Aucune explication en dehors de [DEBUT] et [FIN].
+        - Aucun commentaire ni texte additionnel.
+        - Le contenu doit être directement prêt à utilisation.
         """
 
-class Functions:
+
+    
+class Scrapper:
     @staticmethod
-    def get_normalized_content(job_description: str, resume: str, cover_letter_example: str = "") -> str:
-        content = Config.PRE_PROMPT + f"""
-        Voici l'offre d'emploi ou le poste visé :
-        {job_description}
-        Voici les expériences complètes de l'utilisateur :
-        {resume}
-        """
-        if cover_letter_example:
-            content += f"""
-            Voici un exemple de lettre de motivation fourni par l'utilisateur :
-            {cover_letter_example}
-            """
+    def scrap_wtj(soup):
+        compagny = soup.find('div', attrs={'data-testid': 'job-metadata-block'}).get_text()
+        job_description = soup.find("div", id="the-position-section").get_text()
+        content = compagny + job_description
+        return content
+
+    @staticmethod
+    def scrap_hellowork(soup):
+        title_company = soup.find("h1", class_="tw-inline tw-scroll-mt-[4.5rem]").get_text()
+        job_description = soup.find("div", class_="tw-leading-relaxed tw-line-clamp-[17] sm:tw-line-clamp-[20] tw-typo-long-m").get_text()
+        profil = soup.find("div", class_="tw-overflow-hidden peer-checked:tw-mt-2 tw-max-h-0 tw-opacity-0 tw-transition-all tw-ease-in-out tw-duration-400 peer-checked:tw-max-h-[3000px] peer-checked:tw-opacity-100").get_text()
+        content = title_company + job_description + profil
         return content
     
+
+    @staticmethod
+    def scrap_linkedin(soup):
+        pass
+        # return content
+    
+    @staticmethod
+    def scrap_indeed(soup):
+        content = soup.find("div", class_='jobsearch-JobComponent-description css-dyse26 eu4oa1w0').get_text()
+        # title = soup.find("h2", attrs={'data-testid' : 'jobsearch-JobInfoHeader-title'}).get_text()
+        # compagny = soup.find("div", attrs={'data-testid' : 'inlineHeader-companyName'}).get_text()
+        # job_description = 
+        # content = title + compagny + job_description
+        return content
+    
+
     @staticmethod
     def scrap_if_needed(job_description : str):
         if Functions.is_url(job_description):
             print("[INFO] The job description is a URL, scrapping it...")
-            return Functions.scrape_job_description(job_description)
+            return Scrapper.scrape_job_description(job_description)
         print("[INFO] The job description is already provided.")
-        return job_description
-
-    @staticmethod
-    def is_url(url_string: str) -> bool:
-        try:
-            result = urlparse(url_string)
-            return result.scheme in ['http', 'https'] and bool(result.netloc)
-        except ValueError:
-            return False
-        
+        return job_description, True
+    
+    
     @staticmethod
     def scrape_job_description(url: str) -> Tuple[str, bool]:
         headers = {
@@ -105,50 +121,45 @@ class Functions:
             text_content = ""
 
             if "welcometothejungle" in domain:
-                title = soup.find("h1")
-                company = soup.find("a", {"data-testid": "company-link"})
-                desc = soup.find("div", {"data-testid": "job-description"})
-                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
-                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
-                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
-
-            elif "linkedin" in domain:
-                title = soup.find("h1")
-                company = soup.find("a", class_="topcard__org-name-link")
-                desc = soup.find("div", class_="show-more-less-html__markup")
-                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
-                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
-                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
-
+                text_content = Scrapper.scrap_wtj(soup)
             elif "hellowork" in domain or "regionsjob" in domain:
-                title = soup.find("h1")
-                company = soup.find("div", class_="companyName")
-                desc = soup.find("div", class_="description")
-                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
-                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
-                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
-
-            elif "indeed" in domain:
-                title = soup.find("h1")
-                company = soup.find("div", {"data-company-name": True})
-                desc = soup.find("div", {"id": "jobDescriptionText"})
-                text_content = f"{title.get_text(strip=True) if title else ''}\n\n"
-                text_content += f"Entreprise : {company.get_text(strip=True) if company else ''}\n\n"
-                text_content += desc.get_text("\n", strip=True) if desc else soup.get_text("\n", strip=True)
-
+                text_content = Scrapper.scrap_hellowork(soup)
             else:
-                title = soup.find("h1")
-                paragraphs = soup.find_all(["p", "li"])
-                joined = "\n".join(p.get_text(strip=True) for p in paragraphs)
-                text_content = f"{title.get_text(strip=True) if title else ''}\n\n{joined}"
+                return f"[ERROR] Website not handled, we can scrap only :\nWelcomeToTheJungle, HelloWork, Indeed", False
 
             # Nettoyage de texte
             text_content = "\n".join(line.strip() for line in text_content.splitlines() if line.strip())
             if len(text_content) < 200:
                 print("[WARN] Description semble incomplète ou courte.")
-            
+                return f"[ERROR] You should COPY the job description\nCouldn't scrape {url}", False
+
             print(f"[INFO] Description :\n {text_content}")
             return text_content, True
 
         except requests.exceptions.RequestException as e:
-            return f"[ERROR] Couldn't scrape {url}: {e}", False
+            return f"[ERROR] You should COPY the job description\nCouldn't scrape {url}: {e}", False
+
+class Functions:
+    @staticmethod
+    def get_normalized_content(job_description: str, resume: str, guidelines: str = "") -> str:
+        content = Config.PRE_PROMPT + f"""
+        Voici l'offre d'emploi ou le poste visé :
+        {job_description}
+        Voici les expériences complètes de l'utilisateur :
+        {resume}
+        """
+        if guidelines:
+            content += f"""
+            Voici des instructions fournies par l'utilisateur :
+            {guidelines}
+            """
+        return content
+
+    @staticmethod
+    def is_url(url_string: str) -> bool:
+        try:
+            result = urlparse(url_string)
+            return result.scheme in ['http', 'https'] and bool(result.netloc)
+        except ValueError:
+            return False
+        

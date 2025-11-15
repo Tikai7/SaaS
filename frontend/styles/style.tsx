@@ -111,7 +111,7 @@ export const buttonStyles = {
         cursor: 'pointer',
         width: '15%',
         marginTop: '3%',
-        border : "2px solid " + PALETTE.black,
+        // border : "2px solid " + PALETTE.black,
     },
 
 };
@@ -161,7 +161,7 @@ export const containerStyles = {
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: '20px 40px',
-        borderBottom: `2px solid ${PALETTE.black}`,
+        // borderBottom: `2px solid ${PALETTE.black}`,
     },
     navContainer: {
         display: 'flex',
