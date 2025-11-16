@@ -18,9 +18,14 @@ export async function GenerateCoverLetter(
     }
 ){
     try {
-        console.log("[INFO] Generating cover letter...")
-        const response = await axios.post('http://127.0.0.1:8000/groq', data);
-        return response.data;
+        if (data["job_description"]) {
+            console.log("[INFO] Generating cover letter...")
+            const response = await axios.post('http://127.0.0.1:8000/groq', data);
+            return response.data;
+        }
+        return {
+            "content" : "Madame Monsieur\nJE SUIS UN ENORME FILS... c'est ça tu veux ? Non ?\nAlors fourni une description.\n(stp)"
+        }
     } catch (error) {
         console.error('Erreur API:', error);
         throw error;

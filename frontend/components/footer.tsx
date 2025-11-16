@@ -1,9 +1,9 @@
-import { containerStyles } from "@/styles/style";
+import { containerStyles, textStyles } from "@/styles/style";
 
 export default function Footer() {
     return (
         <footer style={containerStyles.footerContainer}>
-            <p>&copy; {new Date().getFullYear()} MonSite. Tous droits réservés.</p>
+            <p style={textStyles.pFooter}>&copy; {new Date().getFullYear()} LetterIn. Tous droits réservés.</p>
         </footer>
     );
 }

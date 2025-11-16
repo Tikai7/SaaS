@@ -146,7 +146,7 @@ export default function Letter() {
                 Générez en
                 <span style={{...textStyles.h1, color : PALETTE.white}}> un clic</span><br/> vos lettres de motivation !
             </h1>
-            <p style={textStyles.p}>Completez vos expériences, et ajoutez des instructions pour avoir <br/> la meilleure génération possible :)</p>
+            <p style={textStyles.p}>Completez vos expériences, et ajoutez des instructions pour avoir <br/> la meilleure génération possible 😊</p>
 
             <div style={containerStyles.buttonContainer}>
                 <button onClick={handleCompleteXP} style={buttonStyles.secondary}>
@@ -170,7 +170,7 @@ export default function Letter() {
             }
             {
                 isModalGuidelinesOpen && 
-                <UserContext  
+                <UserContext 
                     handleComplete={handleCompleteLetter} 
                     handleSave={handleLetterSave} 
                     isExperiences={false} 
@@ -298,7 +298,7 @@ export default function Letter() {
                 </div>
             )}
             <button style={buttonStyles.generateButton} onClick={Generate} disabled={isLoading}>
-                {isLoading ? 'Génération en cours...' : 'Générer'}
+                {isLoading ? 'Génération en cours... ⌛' : 'Générer'}
             </button>
         </section>
         

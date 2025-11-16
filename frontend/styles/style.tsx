@@ -4,6 +4,7 @@ export const TOAST_TIME = 2000
 export const PALETTE = {
     primary: '#019875',
     secondary: '#B8293D',
+    terciary : "#002408",
     white: '#FFFFFF',
     black: '#000000',
     text: '#333333',
@@ -33,6 +34,12 @@ export const linkStyles = {
 };
 
 export const textStyles = {
+    name : {
+        fontSize: '28px',
+        fontWeight: 'bold' as const,
+        color : PALETTE.primary,
+        marginBottom: '15px',
+    },
     h1: {
         fontSize: '64px',
         fontWeight: 'bold',
@@ -59,6 +66,10 @@ export const textStyles = {
         textAlign: 'center' as const,
         marginTop: '1%',
         color : PALETTE.black
+    },
+    pFooter : {
+        // borderTop: '1px solid #1a1a1a',
+        // padding : "1%"
     },
     span: {
         fontSize: '16px',
@@ -102,7 +113,7 @@ export const buttonStyles = {
         cursor: 'pointer',
     },
     generateButton: {
-        backgroundColor: PALETTE.secondary,
+        backgroundColor: PALETTE.terciary,
         color: PALETTE.white,
         fontSize: '16px',
         fontWeight: 'bold',
@@ -174,14 +185,45 @@ export const containerStyles = {
         marginTop: '5%',
         marginBottom: '3%',
     },
-    letterSectionContainer : {
+    letterSectionContainer: {
         backgroundColor: PALETTE.primary,
-        display : "flex",
+        display: "flex",
         flexDirection: 'column' as const,
-        alignItems : "center",
-        justifyContent : "center",
+        alignItems: "center",
+        justifyContent: "center",
         padding: '80px 40px',
+        position: 'relative' as const,
+        overflow: 'hidden', 
+        backgroundImage: `
+            repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.05) 0px,
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 20px
+            ),
+            repeating-linear-gradient(
+                45deg,
+                rgba(255, 255, 255, 0.05) 0px,
+                rgba(255, 255, 255, 0.05) 1px,
+                transparent 1px,
+                transparent 20px
+            ),
+            /* 2. Ajout d'un léger grain/point */
+            radial-gradient(circle, rgba(255, 255, 255, 0.05) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px, 40px 40px, 10px 10px', /* Taille du grain à la fin */
+        backgroundRepeat: 'repeat',
+        zIndex: 1, 
     },
+    // letterSectionContainer : {
+    //     backgroundColor: PALETTE.primary,
+    //     display : "flex",
+    //     flexDirection: 'column' as const,
+    //     alignItems : "center",
+    //     justifyContent : "center",
+    //     padding: '80px 40px',
+    // },
     jobDescriptionContainer: {
         marginTop: '1%',
         width: '100%',
@@ -214,7 +256,7 @@ export const containerStyles = {
     testimonialsContainer: {
         display: 'flex',
         justifyContent: 'center',
-        gap: '20px',
+        gap: '100px',
         marginTop: '30px',
         flexWrap: 'wrap' as const,
     },
@@ -222,8 +264,9 @@ export const containerStyles = {
         backgroundColor: PALETTE.white,
         padding: '20px',
         borderRadius: '8px',
-        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+        boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
         maxWidth: '300px',
+        
     },
     generatedLetterContainer: {
         marginTop: '1%',
