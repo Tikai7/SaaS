@@ -4,6 +4,10 @@ from typing import Tuple
 from bs4 import BeautifulSoup 
 
 class Config:
+    ORIGINS = [
+        "http://localhost:3000",  
+        "https://letterin.vercel.app/"
+    ]
     CURRENT_MODEL_INDEX = 0
     TOO_MANY_REQUESTS = 429
     AVAILABLE_MODELS = [
