@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export async function TestAPI() {
     try {
-        const response = await axios.get('http://127.0.0.1:8000/');
+        const response = await axios.get('https://letterin-backend.vercel.app/');
         return response.data;
     } catch (error) {
         console.error('Erreur API:', error);
@@ -20,7 +20,7 @@ export async function GenerateCoverLetter(
     try {
         if (data["job_description"] && data["resume"]) {
             console.log("[INFO] Generating cover letter...")
-            const response = await axios.post('http://127.0.0.1:8000/groq', data);
+            const response = await axios.post('https://letterin-backend.vercel.app/groq', data);
             return response.data;
         }
         else
