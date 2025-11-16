@@ -16,7 +16,7 @@ export default function Footer() {
                 <div style={containerStyles.footerCard}>
                     <h3 style={textStyles.columnTitleStyle}>Contactez-nous</h3>
                     <p style={textStyles.columnTextStyle} >
-                        E-mail : ailimis@outlook.com
+                        E-mail : ailimis@outlook.fr
                     </p>
                     <p style={textStyles.columnTextStyle}>
                         Discord : tikai.#3804
