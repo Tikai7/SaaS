@@ -90,13 +90,8 @@ class Scrapper:
     @staticmethod
     def scrap_indeed(soup):
         content = soup.find("div", class_='jobsearch-JobComponent-description css-dyse26 eu4oa1w0').get_text()
-        # title = soup.find("h2", attrs={'data-testid' : 'jobsearch-JobInfoHeader-title'}).get_text()
-        # compagny = soup.find("div", attrs={'data-testid' : 'inlineHeader-companyName'}).get_text()
-        # job_description = 
-        # content = title + compagny + job_description
         return content
     
-
     @staticmethod
     def scrap_if_needed(job_description : str):
         if Functions.is_url(job_description):
@@ -112,7 +107,6 @@ class Scrapper:
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
                           "(KHTML, like Gecko) Chrome/120.0 Safari/537.36"
         }
-
         try:
             response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
@@ -125,20 +119,20 @@ class Scrapper:
             elif "hellowork" in domain or "regionsjob" in domain:
                 text_content = Scrapper.scrap_hellowork(soup)
             else:
-                return f"[ERROR] Website not handled, we can scrap only :\nWelcomeToTheJungle, HelloWork, Indeed", False
+                return f"[ERROR] Site pas pris en compte, on peut scrap que :\nWelcomeToTheJungle, HelloWork", False
 
             # Nettoyage de texte
             text_content = "\n".join(line.strip() for line in text_content.splitlines() if line.strip())
             if len(text_content) < 200:
                 print("[WARN] Description semble incomplète ou courte.")
-                return f"[ERROR] You should COPY the job description\nCouldn't scrape {url}", False
+                return f"[ERROR] Vous devez copier la description du poste\n On n'a pas pu extraire les données de {url}", False
 
             print(f"[INFO] Description :\n {text_content}")
             return text_content, True
-
-        except requests.exceptions.RequestException as e:
-            return f"[ERROR] You should COPY the job description\nCouldn't scrape {url}: {e}", False
-
+    
+        except Exception as e:
+            return f"[ERROR] Vous devez copier la description du poste\n On n'a pas pu extraire les données de {url}", False
+        
 class Functions:
     @staticmethod
     def get_normalized_content(job_description: str, resume: str, guidelines: str = "") -> str:

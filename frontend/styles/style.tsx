@@ -69,13 +69,23 @@ export const textStyles = {
     },
     pFooter : {
         // borderTop: '1px solid #1a1a1a',
-        // padding : "1%"
+        // padding : "1%",
+        marginLeft: "-1%"
     },
     span: {
         fontSize: '16px',
         fontStyle: 'italic' as const,
         color : PALETTE.gray
     },
+    columnTitleStyle : {
+        fontWeight: 'bold',
+        marginBottom: '10px',
+        color: PALETTE.white, 
+    },
+    columnTextStyle : {
+        marginBottom: '5px',
+        color: PALETTE.white, 
+    }
 };
 
 
@@ -248,10 +258,15 @@ export const containerStyles = {
         textAlign: 'center' as const,
     },
     footerContainer : {
+        display : "flex",
+        flexDirection : "column" as const,
+        alignItems : "center",
+        justifyContent : "center",
         backgroundColor: PALETTE.black,
         color: PALETTE.white,
-        textAlign: 'center' as const,   
-        padding: "5%",
+        textAlign: 'left' as const, 
+        padding: "2% 0", 
+        width : "100%"
     },
     testimonialsContainer: {
         display: 'flex',
@@ -266,7 +281,6 @@ export const containerStyles = {
         borderRadius: '8px',
         boxShadow: '0 10px 20px rgba(0, 0, 0, 0.1)',
         maxWidth: '300px',
-        
     },
     generatedLetterContainer: {
         marginTop: '1%',
@@ -289,5 +303,16 @@ export const containerStyles = {
         fontFamily: 'Inter, sans-serif', // Utilisez la même police que le reste de votre design
         backgroundColor: PALETTE.white,
         color: PALETTE.text,
+    },
+    footerInfoContainer : {
+        display: 'flex',
+        justifyContent: 'center',
+        gap: '200px',
+        flexWrap: 'wrap' as const,
+    },
+    footerCard: {
+        backgroundColor: PALETTE.black,
+        padding: '20px',
+        maxWidth: '300px',
     },
 };

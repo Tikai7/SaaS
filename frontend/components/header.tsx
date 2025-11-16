@@ -6,14 +6,14 @@ import { useState } from "react";
 export default function Header() {
     const [toastMessage, setToastMessage] = useState('')
     const [isToastVisible, setIsToastVisible] = useState(false)
+    const [selected, setSelected] = useState('')
 
     function handleDefault(page : string){
         let message = "Pas encore codé chef 🙈"
         if (page === "Acceuil")
             message = "T'es déjà là connard"
-        else if (page === "Logo")
-            message = "C'est juste un logo frero"
-
+        
+        setSelected(page)
         setIsToastVisible(true)
         setToastMessage(message)
         setTimeout(() => {
@@ -25,13 +25,13 @@ export default function Header() {
     return (
         <header style={containerStyles.headerContainer}>
             <div>
-                <a onClick={()=>handleDefault("Logo")} style={{...textStyles.name, color:PALETTE.black}}>Letter<span style={textStyles.name}>In</span></a>
+                <a href="#" onClick={()=>handleDefault("Acceuil")} style={{...textStyles.name, color:PALETTE.black}}>Letter<span style={textStyles.name}>In</span></a>
             </div>
             <nav style={containerStyles.navContainer}>
-                <a href="#" onClick={()=>handleDefault("Acceuil")} style={linkStyles.navLink}>Accueil</a>
-                <a href="#" onClick={()=>handleDefault("About")} style={linkStyles.navLink}>À propos</a>
-                <a href="#" onClick={()=>handleDefault("Contact")} style={linkStyles.navLink}>Contact</a>
-                <a href="#" onClick={()=>handleDefault("Connexion")} style={linkStyles.navLink}>Connexion</a>
+                <a href="#" onClick={()=>handleDefault("Acceuil")} style={{...linkStyles.navLink, color : selected == "Acceuil" ? PALETTE.primary : PALETTE.black}}>Accueil</a>
+                <a href="#info-section" style={linkStyles.navLink}>À propos</a>
+                <a href="#info-section" style={linkStyles.navLink}>Contact</a>
+                <a href="#" onClick={()=>handleDefault("Connexion")} style={{...linkStyles.navLink, color : selected == "Connexion" ? PALETTE.primary : PALETTE.black}}>Connexion</a>
             </nav>
             {isToastVisible && (
                 <div 

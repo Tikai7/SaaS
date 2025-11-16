@@ -46,7 +46,7 @@ def get_cover_letter(user_prompt: dict):
 
     if not state:
         return {
-            "content" : job_description,
+            "content": job_description,
             "used_model" : "None"
         }
     try:
@@ -62,7 +62,7 @@ def get_cover_letter(user_prompt: dict):
         if Config.CURRENT_MODEL_INDEX >= len(Config.AVAILABLE_MODELS):
             Config.CURRENT_MODEL_INDEX = 0
             return {
-                "content": "[ERROR] Sorry, all models have been rate limited. Please try again in 1 minute.",
+                "content": "[ERROR] Désolé, tous les modèles ont atteint leur limite d'utilisation. Veuillez réessayer dans 1 minute.",
                 "used_model" : "None"
             }
         return get_cover_letter(user_prompt)

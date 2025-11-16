@@ -7,13 +7,11 @@ import UserContext from "@/components/info"
 export default function Letter() {
 
     const [generatedCoverLetter, setGeneratedCoverLetter] = useState([] as string[]);
-    // CORRECTION 1: Initialisation de jobDescription avec au moins un élément
+    const [stateCoverLetter, setStateCoverLetter] = useState([] as boolean[])
     const [jobDescription, setJobDescription] = useState<string[]>(['']);
     const [resume, setResume] = useState('');
     const [guidelines, setGuidelines] = useState('');
     const [isLoading, setIsLoading] = useState(false); 
-    // CORRECTION 2: numberOfJobs synchronisé avec la longueur de jobDescription
-    const [numberOfJobs, setNumberOfJobs] = useState(1);
     const [isModalXPOpen, setIsModalXPOpen] = useState(false);
     const [isModalGuidelinesOpen, setIsModalGuidelinesOpen] = useState(false);
     const [openLetters, setOpenLetters] = useState([] as boolean[])
@@ -41,13 +39,18 @@ export default function Letter() {
                 console.log('API Response:', response);
                 return formatGeneratedText(response["content"]);
             })
+            const stateLetter = apiResponses.map(response => {
+                return response["used_model"] !== "None"
+            })
             setGeneratedCoverLetter(coverLetters);
+            setStateCoverLetter(stateLetter)
             const initialOpenState = coverLetters.map((_, index) => index === 0);
             setOpenLetters(initialOpenState);
         }
         catch (error) {
             console.error('Error during API call:', error);
             setGeneratedCoverLetter(['An error occurred during generation. Please try again.']);
+            setStateCoverLetter([false])
         }
         setIsLoading(false); 
     }
@@ -55,14 +58,12 @@ export default function Letter() {
     function handleAddJob() {
         if (jobDescription.length < MAX_JOB) { 
             setJobDescription(oldDescriptions => [...oldDescriptions, '']); 
-            setNumberOfJobs(old => old + 1); 
         }
     }
     
     function handleRemoveJob(indexToDelete: number) {
         if (jobDescription.length > 1) {
             setJobDescription(oldDescriptions => oldDescriptions.filter((_, index) => index !== indexToDelete));
-            setNumberOfJobs(old => old - 1); 
         }
     }
     
@@ -223,7 +224,7 @@ export default function Letter() {
                                 style={{
                                     ...textStyles.h3, 
                                     textAlign: 'left', 
-                                    color: PALETTE.primary, 
+                                    color: stateCoverLetter[index]  ? PALETTE.primary : PALETTE.secondary,
                                     cursor: 'pointer',
                                     display: 'flex',
                                     justifyContent: 'space-between',
@@ -243,7 +244,12 @@ export default function Letter() {
                                             e.stopPropagation(); 
                                             copyToClipboard(content, index);
                                         }}
-                                        style={{ background: 'none', border: 'none', cursor: 'pointer', color: PALETTE.primary, padding: 0 }}
+                                        style={{ background: 'none', 
+                                            border: 'none', 
+                                            cursor: 'pointer', 
+                                            color: stateCoverLetter[index]  ? PALETTE.primary : PALETTE.secondary,
+                                            padding: 0 
+                                        }}
                                         title="Copier la lettre"
                                     >
                                         <MdContentCopy size={24} /> 
