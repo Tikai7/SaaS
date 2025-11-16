@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 class Config:
     ORIGINS = [
         "http://localhost:3000",  
-        "https://letterin.vercel.app/"
+        "https://letterin.vercel.app"
     ]
     CURRENT_MODEL_INDEX = 0
     TOO_MANY_REQUESTS = 429
