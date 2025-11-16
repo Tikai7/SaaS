@@ -17,44 +17,67 @@ export default function Letter() {
     const [openLetters, setOpenLetters] = useState([] as boolean[])
     const [isToastVisible, setIsToastVisible] = useState(false)
     const [toastMessage, setToastMessage] = useState('')
+    const [toastColor, setToastColor] = useState(PALETTE.primary)
+
+    function isContentful(str: string | string[]): boolean {
+        if (typeof str === 'string') { 
+            return str.trim().length > 0;
+        } 
+        else if (Array.isArray(str)) {
+            return str.every(s => s && s.trim().length > 0);
+        }
+        return false;
+    }
 
     async function Generate() {
-        setIsLoading(true); 
-        setGeneratedCoverLetter([]); 
-        setOpenLetters([]); 
+        if (isContentful(jobDescription) && isContentful(resume)) {
+            setIsLoading(true); 
+            setGeneratedCoverLetter([]); 
+            setOpenLetters([]); 
 
-        try {
-            const generationPromises = jobDescription.map(description => {
-                return GenerateCoverLetter(
-                    {
-                        job_description: description,
-                        resume: resume,
-                        guidelines: guidelines
-                    }
-                );
-            });
+            try {
+                const generationPromises = jobDescription.map(description => {
+                    return GenerateCoverLetter(
+                        {
+                            job_description: description,
+                            resume: resume,
+                            guidelines: guidelines
+                        }
+                    );
+                });
 
-            const apiResponses = await Promise.all(generationPromises);
-            const coverLetters = apiResponses.map(response => {
-                console.log('API Response:', response);
-                return formatGeneratedText(response["content"]);
-            })
-            const stateLetter = apiResponses.map(response => {
-                return response["used_model"] !== "None"
-            })
-            setGeneratedCoverLetter(coverLetters);
-            setStateCoverLetter(stateLetter)
-            const initialOpenState = coverLetters.map((_, index) => index === 0);
-            setOpenLetters(initialOpenState);
+                const apiResponses = await Promise.all(generationPromises);
+                const coverLetters = apiResponses.map(response => {
+                    console.log('API Response:', response);
+                    return formatGeneratedText(response["content"]);
+                })
+                const stateLetter = apiResponses.map(response => {
+                    return response["used_model"] !== "None"
+                })
+                setGeneratedCoverLetter(coverLetters);
+                setStateCoverLetter(stateLetter)
+                const initialOpenState = coverLetters.map((_, index) => index === 0);
+                setOpenLetters(initialOpenState);
+            }
+            catch (error) {
+                console.error('Error during API call:', error);
+                setGeneratedCoverLetter(['An error occurred during generation. Please try again.']);
+                setStateCoverLetter([false])
+            }
+            setIsLoading(false); 
         }
-        catch (error) {
-            console.error('Error during API call:', error);
-            setGeneratedCoverLetter(['An error occurred during generation. Please try again.']);
-            setStateCoverLetter([false])
+        else{
+            setToastColor(PALETTE.secondary)
+            setToastMessage("Vous devez fournir une description et des expériences !");
+            setIsToastVisible(true);
+            setTimeout(() => {
+                setIsToastVisible(false);
+                setToastMessage('');
+                setToastColor(PALETTE.primary)
+            }, 2*TOAST_TIME); 
         }
-        setIsLoading(false); 
     }
-        
+
     function handleAddJob() {
         if (jobDescription.length < MAX_JOB) { 
             setJobDescription(oldDescriptions => [...oldDescriptions, '']); 
@@ -288,7 +311,7 @@ export default function Letter() {
                         bottom: '30px',
                         left: '50%',
                         transform: 'translateX(-50%)',
-                        backgroundColor: PALETTE.primary, 
+                        backgroundColor: toastColor,
                         color: PALETTE.white,
                         padding: '10px 20px',
                         borderRadius: '8px',
